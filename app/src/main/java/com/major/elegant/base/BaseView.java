@@ -8,4 +8,7 @@ package com.major.elegant.base;
 
 public interface BaseView {
 
+    void showDialog();
+
+    void hideDialog();
 }

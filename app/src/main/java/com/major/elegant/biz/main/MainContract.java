@@ -8,31 +8,26 @@ import com.major.elegant.bean.Gank;
 import rx.Observable;
 
 /**
- * @desc: TODO
+ * @desc: 契约类
  * @author: Major
  * @since: 2017/2/22 0:22
  */
 public interface MainContract {
 
-    interface MainView extends BaseView {
-
-        void showDialog();
-
-        void hideDialog();
+    interface View extends BaseView {
 
         void onSuccess(Gank data);
 
         void onFailure(String err);
     }
 
-    interface MainModel extends BaseModel {
+    interface Model extends BaseModel {
 
         Observable<Gank> getGank(int page);
     }
 
-    abstract class MainPresenter extends BasePresenter<MainView, MainModel> {
+    abstract class Presenter extends BasePresenter<View, Model> {
 
         public abstract void getGank(int page);
     }
-
 }

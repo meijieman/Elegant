@@ -11,7 +11,7 @@ import rx.Observable;
  * @author: Major
  * @since: 2017/2/22 0:16
  */
-public class MainModelImpl implements MainContract.MainModel {
+public class MainModel implements MainContract.Model {
 
     @Override
     public Observable<Gank> getGank(int page) {

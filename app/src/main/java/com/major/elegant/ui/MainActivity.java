@@ -1,77 +1,62 @@
 package com.major.elegant.ui;
 
-import android.app.ProgressDialog;
-import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.major.elegant.R;
 import com.major.elegant.base.BaseActivity;
 import com.major.elegant.bean.Gank;
 import com.major.elegant.biz.main.MainContract;
-import com.major.elegant.biz.main.MainPresenterImpl;
+import com.major.elegant.biz.main.MainPresenter;
+import com.major.elegant.util.SnackbarUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity<MainPresenterImpl> implements MainContract.MainView {
+public class MainActivity extends BaseActivity<MainPresenter> implements MainContract.View {
 
-    private ListView       mListView;
-    private ProgressDialog mDialog;
+    private ListView mListView;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected int getLayoutId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected MainPresenter onCreatePresenter() {
+        return new MainPresenter(this);
+    }
+
+    @Override
+    protected void init() {
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener(new android.view.View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(android.view.View view) {
 
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null)
-//                        .show();
+                mListView.setAdapter(null);
+                mPresenter.getGank(1);
             }
         });
 
         mListView = (ListView)findViewById(R.id.lv_main);
-
-        mDialog = new ProgressDialog(this);
-        mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mDialog.setCancelable(false);
-        mDialog.setMessage("加载中...");
-
-    }
-
-    @Override
-    protected MainPresenterImpl onCreatePresenter() {
-        return new MainPresenterImpl(this);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -80,33 +65,26 @@ public class MainActivity extends BaseActivity<MainPresenterImpl> implements Mai
     }
 
     @Override
-    public void showDialog() {
-        if (mDialog != null) {
-            mDialog.show();
-        }
-    }
-
-    @Override
-    public void hideDialog() {
-        if (mDialog != null) {
-            mDialog.dismiss();
-        }
-    }
-
-    @Override
     public void onSuccess(Gank data) {
-        Toast.makeText(MainActivity.this, "请求成功", Toast.LENGTH_SHORT).show();
+        SnackbarUtil.show(mListView, "请求成功");
         List<Gank.Result> results = data.getResults();
-        List<String> list = new ArrayList<>();
-        for (Gank.Result result : results) {
-            list.add(result.toString());
+        String[] strs = new String[results.size()];
+        for (int i = 0; i < results.size(); i++) {
+            Gank.Result result = results.get(i);
+            strs[i] = result.toString();
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, (String[])list.toArray());
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, strs);
         mListView.setAdapter(adapter);
     }
 
     @Override
     public void onFailure(String err) {
-        Toast.makeText(MainActivity.this, "请求失败", Toast.LENGTH_SHORT).show();
+        SnackbarUtil.show(mListView, "请求失败", "重试", new android.view.View.OnClickListener() {
+            @Override
+            public void onClick(android.view.View v) {
+                mListView.setAdapter(null);
+                mPresenter.getGank(1);
+            }
+        });
     }
 }

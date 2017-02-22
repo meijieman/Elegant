@@ -1,8 +1,7 @@
 package com.major.elegant.api;
 
-import android.util.Log;
-
 import com.major.elegant.base.App;
+import com.major.elegant.util.LogUtil;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -21,8 +20,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class ApiFactory {
 
-    private static final String TAG = "ApiFactory";
-
     private volatile static ApiFactory sInstance;
 
     private Retrofit mRetrofit;
@@ -32,14 +29,15 @@ public class ApiFactory {
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         int size = 1024 * 1024 * 10;
-        File cacheFile = new File(App.getInstance().getCacheDir(), "OkHttpCache");
-        Log.e(TAG, "ApiFactory: cacheFile " + cacheFile.getAbsolutePath());
+        File cacheFile = new File(App.getInstance().getExternalCacheDir(), "okHttp");
+        LogUtil.w("cacheFile " + cacheFile.getAbsolutePath());
         Cache cache = new Cache(cacheFile, size);
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(12, TimeUnit.SECONDS)
                 .writeTimeout(12, TimeUnit.SECONDS)
-//                .addNetworkInterceptor(new )
+//                .retryOnConnectionFailure(true)
+                .addNetworkInterceptor(new NetworkInterceptor())
                 .addInterceptor(loggingInterceptor)
                 .cache(cache)
                 .build();
@@ -47,12 +45,12 @@ public class ApiFactory {
         mRetrofit = new Retrofit.Builder()
                 .baseUrl(ApiService.BASE_URL)
                 .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create()) // 解析数据
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
     }
 
-    public static ApiFactory getInstance(){
+    public static ApiFactory getInstance() {
         if (sInstance == null) {
             synchronized (ApiFactory.class) {
                 sInstance = new ApiFactory();
@@ -61,7 +59,7 @@ public class ApiFactory {
         return sInstance;
     }
 
-    public ApiService getApiService(){
+    public ApiService getApiService() {
         return mRetrofit.create(ApiService.class);
     }
 }
