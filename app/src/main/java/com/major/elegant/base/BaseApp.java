@@ -7,9 +7,9 @@ import android.app.Application;
  * @author: Major
  * @since: 2017/2/22 0:44
  */
-public class App extends Application {
+public class BaseApp extends Application {
 
-    private static App sInstance;
+    private static BaseApp sInstance;
 
     @Override
     public void onCreate() {
@@ -17,7 +17,7 @@ public class App extends Application {
         sInstance = this;
     }
 
-    public static App getInstance() {
+    public static BaseApp getInstance() {
         return sInstance;
     }
 }

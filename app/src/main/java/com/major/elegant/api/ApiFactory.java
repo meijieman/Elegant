@@ -1,6 +1,6 @@
 package com.major.elegant.api;
 
-import com.major.elegant.base.App;
+import com.major.elegant.base.BaseApp;
 import com.major.elegant.util.LogUtil;
 
 import java.io.File;
@@ -29,7 +29,7 @@ public class ApiFactory {
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         int size = 1024 * 1024 * 10;
-        File cacheFile = new File(App.getInstance().getExternalCacheDir(), "okHttp");
+        File cacheFile = new File(BaseApp.getInstance().getCacheDir(), "okHttp");
         LogUtil.w("cacheFile " + cacheFile.getAbsolutePath());
         Cache cache = new Cache(cacheFile, size);
 
@@ -37,8 +37,9 @@ public class ApiFactory {
                 .connectTimeout(12, TimeUnit.SECONDS)
                 .writeTimeout(12, TimeUnit.SECONDS)
 //                .retryOnConnectionFailure(true)
+                .addInterceptor(new NetworkInterceptor())
                 .addNetworkInterceptor(new NetworkInterceptor())
-                .addInterceptor(loggingInterceptor)
+//                .addInterceptor(loggingInterceptor)
                 .cache(cache)
                 .build();
 
