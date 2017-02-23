@@ -26,7 +26,7 @@ public class ApiFactory {
 
     private ApiFactory() {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
 
         int size = 1024 * 1024 * 10;
         File cacheFile = new File(BaseApp.getInstance().getCacheDir(), "okHttp");
@@ -37,9 +37,10 @@ public class ApiFactory {
                 .connectTimeout(12, TimeUnit.SECONDS)
                 .writeTimeout(12, TimeUnit.SECONDS)
 //                .retryOnConnectionFailure(true)
-                .addInterceptor(new NetworkInterceptor())
+                .addInterceptor(new CacheInterceptor())
+//                .addNetworkInterceptor(new CacheInterceptor())
                 .addNetworkInterceptor(new NetworkInterceptor())
-//                .addInterceptor(loggingInterceptor)
+                .addInterceptor(loggingInterceptor)
                 .cache(cache)
                 .build();
 

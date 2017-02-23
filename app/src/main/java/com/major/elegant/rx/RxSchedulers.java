@@ -11,7 +11,7 @@ import rx.schedulers.Schedulers;
  */
 public class RxSchedulers {
 
-    public static <T> Observable.Transformer<T, T> switchThrid() {
+    public static <T> Observable.Transformer<T, T> switchThird() {
         return new Observable.Transformer<T, T>() {
             @Override
             public Observable<T> call(Observable<T> tObservable) {

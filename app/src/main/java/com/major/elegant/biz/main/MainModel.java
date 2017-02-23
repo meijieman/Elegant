@@ -18,6 +18,6 @@ public class MainModel implements MainContract.Model {
         return ApiFactory.getInstance()
                          .getApiService()
                          .getGank(page)
-                         .compose(RxSchedulers.<Gank>switchThrid());
+                         .compose(RxSchedulers.<Gank>switchThird());
     }
 }
